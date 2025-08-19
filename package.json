@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "mcp-framework": "^0.2.2",
-    "openai": "^5.12.2"
+    "openai": "^5.12.2",
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
