@@ -1,7 +1,8 @@
 import { MCPTool } from 'mcp-framework';
 import { z } from 'zod';
 import fs from 'fs';
-import { logger } from '../utils/logger';
+
+
 
 const SendFileInputSchema = z.object({
   userId: z.string().describe('ID do usuário para quem enviar o arquivo.'),
@@ -12,9 +13,16 @@ const SendFileInputSchema = z.object({
   mimeType: z.string().nullable().optional().describe('Tipo MIME do arquivo (será detectado automaticamente se não fornecido).'),
 });
 
-type SendFileInput = z.infer<typeof SendFileInputSchema>;
+interface SendFileInput {
+  userId: string;
+  filePath: string;
+  fileName?: string | null;
+  caption?: string | null;
+  withoutPreview?: boolean;
+  mimeType?: string | null;
+}
 
-class SendFileTool extends MCPTool<typeof SendFileInputSchema> {
+class SendFileTool extends MCPTool<SendFileInput> {
   name = 'send_whatsapp_file';
   description = 'Envia um arquivo via WhatsApp para um usuário específico.';
   schema = SendFileInputSchema;
@@ -24,7 +32,7 @@ class SendFileTool extends MCPTool<typeof SendFileInputSchema> {
     try {
       // Verificar se o arquivo existe
       if (!fs.existsSync(filePath)) {
-        logger.error('SendFileTool', `Arquivo não encontrado: ${filePath}`);
+
         return { success: false, message: `Arquivo não encontrado: ${filePath}` };
       }
 
@@ -96,7 +104,7 @@ class SendFileTool extends MCPTool<typeof SendFileInputSchema> {
       // Verificar tamanho do arquivo (limite do WhatsApp é ~64MB)
       const maxSize = 64 * 1024 * 1024; // 64MB
       if (fileStats.size > maxSize) {
-        logger.error('SendFileTool', `Arquivo muito grande: ${fileStats.size} bytes (máximo: ${maxSize} bytes)`);
+
         return { success: false, message: `Arquivo muito grande: ${fileStats.size} bytes` };
       }
 
@@ -134,18 +142,18 @@ class SendFileTool extends MCPTool<typeof SendFileInputSchema> {
 
       if (response.ok) {
         const result = await response.json();
-        logger.info('SendFileTool', `Arquivo enviado com sucesso para ${userId}: ${actualFileName} (${fileStats.size} bytes)`);
+
         return { success: true, message: 'Arquivo enviado com sucesso.', result };
       } else {
         const errorText = await response.text();
-        logger.error('SendFileTool', `Erro ao enviar arquivo: ${response.status} - ${errorText}`);
+
         return { success: false, message: `Erro ao enviar arquivo: ${response.status} - ${errorText}` };
       }
     } catch (error: any) {
-      logger.error('SendFileTool', 'Erro ao enviar arquivo', error);
+
       return { success: false, message: `Erro ao enviar arquivo: ${error.message}` };
     }
   }
 }
 
-export default new SendFileTool();
+export default SendFileTool;

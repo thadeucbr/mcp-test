@@ -1,16 +1,21 @@
 import { MCPTool } from 'mcp-framework';
 import { z } from 'zod';
 import axios from 'axios';
-import { logError } from '../utils/logger';
+
+
 const SendMessageInputSchema = z.object({
   to: z.string().describe('ID do destinatário (usuário ou grupo).'),
   content: z.string().describe('O conteúdo da mensagem a ser enviada.'),
   quotedMsgId: z.string().nullable().optional().describe('ID da mensagem a ser respondida (opcional).'),
 });
 
-type SendMessageInput = z.infer<typeof SendMessageInputSchema>;
+interface SendMessageInput {
+  to: string;
+  content: string;
+  quotedMsgId?: string | null;
+}
 
-class SendMessageTool extends MCPTool<typeof SendMessageInputSchema> {
+class SendMessageTool extends MCPTool<SendMessageInput> {
   name = 'send_whatsapp_message';
   description = 'Envia uma mensagem de texto via WhatsApp para um destinatário específico.';
   schema = SendMessageInputSchema;
@@ -71,11 +76,11 @@ class SendMessageTool extends MCPTool<typeof SendMessageInputSchema> {
       const response = await axios.post(url, data, options);
       return response.data;
     } catch (error: any) {
-      logError(error, `SendMessageTool - Failed to send message to ${to}`);
+
       console.error('Error:', error);
       throw error;
     }
   }
 }
 
-export default new SendMessageTool();
+export default SendMessageTool;

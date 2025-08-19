@@ -1,16 +1,20 @@
 import { MCPTool } from 'mcp-framework';
 import { z } from 'zod';
 import axios from 'axios';
-import { logError } from '../utils/logger';
+
+
 
 const SimulateTypingInputSchema = z.object({
   to: z.string().describe('ID do destinatário (usuário ou grupo).'),
   on: z.boolean().describe('Se a simulação de digitação deve ser ativada (true) ou desativada (false).'),
 });
 
-type SimulateTypingInput = z.infer<typeof SimulateTypingInputSchema>;
+interface SimulateTypingInput {
+  to: string;
+  on: boolean;
+}
 
-class SimulateTypingTool extends MCPTool<typeof SimulateTypingInputSchema> {
+class SimulateTypingTool extends MCPTool<SimulateTypingInput> {
   name = 'simulate_whatsapp_typing';
   description = 'Simula o status de digitação no WhatsApp para um destinatário específico.';
   schema = SimulateTypingInputSchema;
@@ -33,11 +37,11 @@ class SimulateTypingTool extends MCPTool<typeof SimulateTypingInputSchema> {
       });
       return response.data;
     } catch (error: any) {
-      logError(error, `SimulateTypingTool - Failed to simulate typing for ${to}`);
+
       console.error(`Error simulating typing for ${to}:`, error.message);
       return { success: false, error: error.message };
     }
   }
 }
 
-export default new SimulateTypingTool();
+export default SimulateTypingTool;

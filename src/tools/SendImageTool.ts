@@ -1,7 +1,8 @@
 import { MCPTool } from 'mcp-framework';
 import { z } from 'zod';
 import axios from 'axios';
-import { logError } from '../utils/logger';
+
+
 
 const SendImageInputSchema = z.object({
   recipient: z.string().describe('ID do destinatário (usuário ou grupo).'),
@@ -9,9 +10,13 @@ const SendImageInputSchema = z.object({
   prompt: z.string().describe('A legenda da imagem.'),
 });
 
-type SendImageInput = z.infer<typeof SendImageInputSchema>;
+interface SendImageInput {
+  recipient: string;
+  base64Image: string;
+  prompt: string;
+}
 
-class SendImageTool extends MCPTool<typeof SendImageInputSchema> {
+class SendImageTool extends MCPTool<SendImageInput> {
   name = 'send_whatsapp_image';
   description = 'Envia uma imagem via WhatsApp para um destinatário específico.';
   schema = SendImageInputSchema;
@@ -48,11 +53,11 @@ class SendImageTool extends MCPTool<typeof SendImageInputSchema> {
       });
       return response.data;
     } catch (error: any) {
-      logError(error, `SendImageTool - Failed to send image to ${recipient}`);
+
       console.error("Error sending image:", error.response ? error.response.data : error.message);
       return { success: false, message: `Failed to send image: ${error.message}` };
     }
   }
 }
 
-export default new SendImageTool();
+export default SendImageTool;

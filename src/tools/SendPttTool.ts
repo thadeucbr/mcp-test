@@ -1,6 +1,7 @@
 import { MCPTool } from 'mcp-framework';
 import { z } from 'zod';
-import { logError } from '../utils/logger';
+
+
 
 const SendPttInputSchema = z.object({
   recipientId: z.string().describe('ID do destinatário (usuário ou grupo).'),
@@ -8,9 +9,13 @@ const SendPttInputSchema = z.object({
   quotedMsgId: z.string().optional().describe('ID da mensagem a ser respondida (opcional).'),
 });
 
-type SendPttInput = z.infer<typeof SendPttInputSchema>;
+interface SendPttInput {
+  recipientId: string;
+  audioBuffer: Buffer;
+  quotedMsgId?: string;
+}
 
-class SendPttTool extends MCPTool<typeof SendPttInputSchema> {
+class SendPttTool extends MCPTool<SendPttInput> {
   name = 'send_whatsapp_ptt';
   description = 'Envia uma mensagem de áudio (PTT) via WhatsApp para um destinatário específico.';
   schema = SendPttInputSchema;
@@ -60,11 +65,11 @@ class SendPttTool extends MCPTool<typeof SendPttInputSchema> {
       console.log('Mensagem de voz enviada com sucesso!');
       return { success: true, message: 'Áudio enviado com sucesso.' };
     } catch (error: any) {
-      logError(error, `SendPttTool - Failed to send PTT to ${recipientId}`);
+
       console.error('Ocorreu um erro no processo de envio de áudio:', error.message);
       return { success: false, error: error.message };
     }
   }
 }
 
-export default new SendPttTool();
+export default SendPttTool;

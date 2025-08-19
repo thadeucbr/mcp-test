@@ -14,7 +14,7 @@ const DeepResearchInputSchema = z.object({
 type DeepResearchInput = z.infer<typeof DeepResearchInputSchema>;
 
 class DeepResearchTool extends MCPTool<typeof DeepResearchInputSchema> {
-  name = 'deep_research';
+  name = 'deep-research';
   description = 'Performs deep research using OpenAI models.';
   schema = DeepResearchInputSchema;
 
@@ -56,4 +56,4 @@ class DeepResearchTool extends MCPTool<typeof DeepResearchInputSchema> {
   }
 }
 
-export default new DeepResearchTool();
+export default DeepResearchTool;
