@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 
 const DeepResearchInputSchema = z.object({
   query: z.string().describe('The research query.'),
-  model: z.enum(['o3-deep-research', 'o4-mini-deep-research']).default('o3-deep-research').describe('The deep research model to use.'),
+  model: z.enum(['o3-deep-research', 'o4-mini-deep-research']).default('o4-mini-deep-research').describe('The deep research model to use.'),
   background: z.boolean().default(true).describe('Whether to run the research in the background.'),
   vector_store_ids: z.array(z.string()).optional().describe('An array of vector store IDs to use for file search.'),
   use_web_search: z.boolean().default(true).describe('Whether to use web search.'),
