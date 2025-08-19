@@ -15,7 +15,7 @@ interface GenerateImageInput {
 
 class GenerateImageTool extends MCPTool<GenerateImageInput> {
   name = 'generate-image';
-  description = 'GenerateImage tool description';
+  description = 'Generate images based on text prompts using AI models.';
 
   schema = {
     prompt: {
