@@ -1,5 +1,3 @@
-
-
 class HttpStreamClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
