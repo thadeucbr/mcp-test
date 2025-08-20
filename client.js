@@ -104,18 +104,23 @@ class HttpStreamClient {
               console.log(`- ${tool.name}`);
             });
             // Busca o nome exato da tool send_whatsapp_message
-            const sendMsgTool = final.result.tools.find(t => t.name.includes("send_whatsapp_message"));
+            const sendMsgTool = final.result.tools.find(t => t.name.includes("whatsapp-send-message"));
             if (sendMsgTool) {
               const sendMessagePayload = {
                 jsonrpc: "2.0",
                 id: "3",
-                method: sendMsgTool.name,
+                method: "tools/call",
                 params: {
-                  to: "5511999999999", // Substitua por um ID real de teste
-                  content: "Olá, esta é uma mensagem de teste enviada via MCP!"
-                  // quotedMsgId: "opcional_id" // descomente se quiser responder a uma mensagem específica
+                  name: sendMsgTool.name,
+                  arguments: {
+                    to: "5511971704940@c.us", // Substitua por um ID real de teste
+                    content: "Olá, esta é uma mensagem de teste enviada via MCP!"
+                    // quotedMsgId: "opcional_id" // descomente se quiser responder a uma mensagem específica
+                  }
                 }
               };
+              console.log("[DEBUG] Enviando request WhatsApp:", JSON.stringify(sendMessagePayload, null, 2));
+              console.log("[DEBUG] Método chamado:", sendMsgTool.name);
               client.sendRequest(sendMessagePayload, (resp) => {
                 console.log("SEND WHATSAPP MESSAGE RESULT:", JSON.stringify(resp));
               });
@@ -123,23 +128,7 @@ class HttpStreamClient {
               console.warn("Tool send_whatsapp_message não encontrada na lista de métodos disponíveis.");
             }
 
-            // Teste: chama a tool example_tool
-            const exampleTool = final.result.tools.find(t => t.name === "example_tool");
-            if (exampleTool) {
-              const examplePayload = {
-                jsonrpc: "2.0",
-                id: "4",
-                method: exampleTool.name,
-                params: {
-                  message: "Mensagem de teste para example_tool"
-                }
-              };
-              client.sendRequest(examplePayload, (resp) => {
-                console.log("EXAMPLE TOOL RESULT:", JSON.stringify(resp));
-              });
-            } else {
-              console.warn("Tool example_tool não encontrada na lista de métodos disponíveis.");
-            }
+  
           }
         });
     },

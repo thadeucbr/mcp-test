@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { MCPServer } from "mcp-framework";
 
 const server = new MCPServer({
@@ -9,7 +10,7 @@ const server = new MCPServer({
         allowOrigin: "*"
       }
     }
-  }
+  },
 });
 
 server.start();
