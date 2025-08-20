@@ -1,0 +1,304 @@
+{
+  "result": {
+    "tools": [
+      {
+        "name": "deep-research",
+        "description": "Performs deep research using OpenAI models.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The research query."
+            },
+            "model": {
+              "type": "string",
+              "description": "The deep research model to use.",
+              "default": "o4-mini-deep-research",
+              "enum": [
+                "o3-deep-research",
+                "o4-mini-deep-research"
+              ]
+            },
+            "background": {
+              "type": "boolean",
+              "description": "Whether to run the research in the background.",
+              "default": true
+            },
+            "vector_store_ids": {
+              "type": "array",
+              "description": "An array of vector store IDs to use for file search.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "use_web_search": {
+              "type": "boolean",
+              "description": "Whether to use web search.",
+              "default": true
+            },
+            "use_code_interpreter": {
+              "type": "boolean",
+              "description": "Whether to use the code interpreter.",
+              "default": false
+            }
+          },
+          "required": [
+            "query",
+            "model",
+            "background",
+            "use_web_search",
+            "use_code_interpreter"
+          ]
+        }
+      },
+      {
+        "name": "example_tool",
+        "description": "An example tool that processes messages",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "description": "Message to process"
+            }
+          },
+          "required": [
+            "message"
+          ]
+        }
+      },
+      {
+        "name": "generate_audio",
+        "description": "Generates audio from text using the OpenAI TTS API and returns a buffer.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "textToSpeak": {
+              "type": "string",
+              "description": "The text to be converted to audio."
+            }
+          },
+          "required": [
+            "textToSpeak"
+          ]
+        }
+      },
+      {
+        "name": "generate-image",
+        "description": "Generate images based on text prompts using AI models.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "Prompt for image generation"
+            },
+            "negative_prompt": {
+              "type": "string",
+              "description": "Negative prompt for image generation"
+            },
+            "seed": {
+              "type": "number",
+              "description": "Seed for random number generation"
+            },
+            "subseed": {
+              "type": "number",
+              "description": "Subseed for additional randomness"
+            },
+            "subseed_strength": {
+              "type": "number",
+              "description": "Strength of the subseed"
+            },
+            "steps": {
+              "type": "number",
+              "description": "Number of steps for image generation"
+            },
+            "width": {
+              "type": "number",
+              "description": "Width of the generated image"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the generated image"
+            },
+            "pag_scale": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "prompt"
+          ]
+        }
+      },
+      {
+        "name": "send_whatsapp_file",
+        "description": "Envia um arquivo via WhatsApp para um usuário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string",
+              "description": "ID do usuário para quem enviar o arquivo."
+            },
+            "filePath": {
+              "type": "string",
+              "description": "Caminho absoluto do arquivo a ser enviado."
+            },
+            "fileName": {
+              "type": "string",
+              "description": "Nome do arquivo (opcional)."
+            },
+            "caption": {
+              "type": "string",
+              "description": "Legenda do arquivo (opcional)."
+            },
+            "withoutPreview": {
+              "type": "boolean",
+              "description": "Se deve enviar sem preview (padrão: false).",
+              "default": false
+            },
+            "mimeType": {
+              "type": "string",
+              "description": "Tipo MIME do arquivo (será detectado automaticamente se não fornecido)."
+            }
+          },
+          "required": [
+            "userId",
+            "filePath"
+          ]
+        }
+      },
+      {
+        "name": "send_whatsapp_image",
+        "description": "Envia uma imagem via WhatsApp para um destinatário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "recipient": {
+              "type": "string",
+              "description": "ID do destinatário (usuário ou grupo)."
+            },
+            "base64Image": {
+              "type": "string",
+              "description": "A imagem em formato base64."
+            },
+            "prompt": {
+              "type": "string",
+              "description": "A legenda da imagem."
+            }
+          },
+          "required": [
+            "recipient",
+            "base64Image",
+            "prompt"
+          ]
+        }
+      },
+      {
+        "name": "send_whatsapp_message",
+        "description": "Envia uma mensagem de texto via WhatsApp para um destinatário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "ID do destinatário (usuário ou grupo)."
+            },
+            "content": {
+              "type": "string",
+              "description": "O conteúdo da mensagem a ser enviada."
+            },
+            "quotedMsgId": {
+              "type": "string",
+              "description": "ID da mensagem a ser respondida (opcional)."
+            }
+          },
+          "required": [
+            "to",
+            "content"
+          ]
+        }
+      },
+      {
+        "name": "send_whatsapp_ptt",
+        "description": "Envia uma mensagem de áudio (PTT) via WhatsApp para um destinatário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "recipientId": {
+              "type": "string",
+              "description": "ID do destinatário (usuário ou grupo)."
+            },
+            "audioBuffer": {
+              "type": "string",
+              "description": "O buffer de áudio a ser enviado."
+            },
+            "quotedMsgId": {
+              "type": "string",
+              "description": "ID da mensagem a ser respondida (opcional)."
+            }
+          },
+          "required": [
+            "recipientId",
+            "audioBuffer"
+          ]
+        }
+      },
+      {
+        "name": "send_whatsapp_reply",
+        "description": "Envia uma mensagem de resposta via WhatsApp para um destinatário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "ID do destinatário (usuário ou grupo)."
+            },
+            "content": {
+              "type": "string",
+              "description": "O conteúdo da mensagem de resposta."
+            },
+            "quotedMsgId": {
+              "type": "string",
+              "description": "ID da mensagem original a ser respondida."
+            },
+            "sendSeen": {
+              "type": "boolean",
+              "description": "Se deve marcar a mensagem como vista (padrão: true).",
+              "default": true
+            }
+          },
+          "required": [
+            "to",
+            "content",
+            "quotedMsgId"
+          ]
+        }
+      },
+      {
+        "name": "simulate_whatsapp_typing",
+        "description": "Simula o status de digitação no WhatsApp para um destinatário específico.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "to": {
+              "type": "string",
+              "description": "ID do destinatário (usuário ou grupo)."
+            },
+            "on": {
+              "type": "boolean",
+              "description": "Se a simulação de digitação deve ser ativada (true) ou desativada (false)."
+            }
+          },
+          "required": [
+            "to",
+            "on"
+          ]
+        }
+      }
+    ]
+  },
+  "jsonrpc": "2.0",
+  "id": "2"
+}

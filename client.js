@@ -95,22 +95,53 @@ class HttpStreamClient {
         method: "tools/list",
         params: {}
       };
-      await client.sendRequest(toolRequest, (final) => console.log("TOOL RESULT:", JSON.stringify(final)));
+        await client.sendRequest(toolRequest, (final) => {
+          console.log("TOOL RESULT:", JSON.stringify(final));
+          // Imprime a lista de métodos disponíveis
+          if (final && final.result && Array.isArray(final.result.tools)) {
+            console.log("\nMétodos disponíveis:");
+            final.result.tools.forEach((tool, idx) => {
+              console.log(`- ${tool.name}`);
+            });
+            // Busca o nome exato da tool send_whatsapp_message
+            const sendMsgTool = final.result.tools.find(t => t.name.includes("send_whatsapp_message"));
+            if (sendMsgTool) {
+              const sendMessagePayload = {
+                jsonrpc: "2.0",
+                id: "3",
+                method: sendMsgTool.name,
+                params: {
+                  to: "5511999999999", // Substitua por um ID real de teste
+                  content: "Olá, esta é uma mensagem de teste enviada via MCP!"
+                  // quotedMsgId: "opcional_id" // descomente se quiser responder a uma mensagem específica
+                }
+              };
+              client.sendRequest(sendMessagePayload, (resp) => {
+                console.log("SEND WHATSAPP MESSAGE RESULT:", JSON.stringify(resp));
+              });
+            } else {
+              console.warn("Tool send_whatsapp_message não encontrada na lista de métodos disponíveis.");
+            }
 
-      // 4. Simulação: chama a tool send_whatsapp_message
-      const sendMessagePayload = {
-        jsonrpc: "2.0",
-        id: "3",
-        method: "send_whatsapp_message",
-        params: {
-          to: "5511999999999", // Substitua por um ID real de teste
-          content: "Olá, esta é uma mensagem de teste enviada via MCP!"
-          // quotedMsgId: "opcional_id" // descomente se quiser responder a uma mensagem específica
-        }
-      };
-      await client.sendRequest(sendMessagePayload, (resp) => {
-        console.log("SEND WHATSAPP MESSAGE RESULT:", JSON.stringify(resp));
-      });
+            // Teste: chama a tool example_tool
+            const exampleTool = final.result.tools.find(t => t.name === "example_tool");
+            if (exampleTool) {
+              const examplePayload = {
+                jsonrpc: "2.0",
+                id: "4",
+                method: exampleTool.name,
+                params: {
+                  message: "Mensagem de teste para example_tool"
+                }
+              };
+              client.sendRequest(examplePayload, (resp) => {
+                console.log("EXAMPLE TOOL RESULT:", JSON.stringify(resp));
+              });
+            } else {
+              console.warn("Tool example_tool não encontrada na lista de métodos disponíveis.");
+            }
+          }
+        });
     },
     (err) => console.error("INIT ERROR:", err)
   );
