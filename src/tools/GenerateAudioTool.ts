@@ -11,9 +11,11 @@ interface GenerateAudioInput {
   textToSpeak: string;
 }
 
+// Tool: GenerateAudioTool
+// Description: Esta ferramenta converte texto em áudio utilizando a API TTS da OpenAI. Recebe um texto e retorna o áudio correspondente em buffer, permitindo que agentes LLM gerem respostas faladas, áudios para WhatsApp, ou outros usos multimodais.
 class GenerateAudioTool extends MCPTool<GenerateAudioInput> {
   name = "generate_audio";
-  description = "Generates audio from text using the OpenAI TTS API and returns a buffer.";
+  description = "Gera áudio a partir de texto usando a API TTS da OpenAI, retornando o áudio em buffer.";
   schema = GenerateAudioInputSchema;
 
   async execute(input: GenerateAudioInput) {

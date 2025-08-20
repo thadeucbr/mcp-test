@@ -13,9 +13,11 @@ interface GenerateImageInput {
   pag_scale: number;
 }
 
+// Tool: GenerateImageTool
+// Description: Esta ferramenta gera imagens a partir de prompts de texto utilizando modelos de IA generativa. Permite customizar parâmetros como prompt negativo, seed, tamanho, passos, etc. Ideal para agentes LLM que precisam criar imagens sob demanda para ilustração, resposta visual ou integração com outros fluxos.
 class GenerateImageTool extends MCPTool<GenerateImageInput> {
   name = 'generate-image';
-  description = 'Generate images based on text prompts using AI models.';
+  description = 'Gera imagens a partir de prompts de texto usando modelos de IA generativa.';
 
   schema = {
     prompt: {

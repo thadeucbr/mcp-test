@@ -13,9 +13,11 @@ const DeepResearchInputSchema = z.object({
 
 type DeepResearchInput = z.infer<typeof DeepResearchInputSchema>;
 
+// Tool: DeepResearchTool
+// Description: Esta ferramenta executa pesquisas profundas utilizando modelos avançados da OpenAI (como o o3-deep-research e o o4-mini-deep-research). Permite realizar buscas na web, consultar arquivos em vetores (vector stores) e utilizar code interpreter para análises complexas. Ideal para agentes LLM que precisam de respostas detalhadas, contextualizadas e baseadas em múltiplas fontes, podendo rodar em background e customizar o uso de recursos.
 class DeepResearchTool extends MCPTool<typeof DeepResearchInputSchema> {
   name = 'deep-research';
-  description = 'Performs deep research using OpenAI models.';
+  description = 'Executa pesquisas profundas e contextualizadas usando modelos OpenAI, com suporte a busca web, arquivos e code interpreter.';
   schema = DeepResearchInputSchema;
 
   async execute(input: DeepResearchInput) {

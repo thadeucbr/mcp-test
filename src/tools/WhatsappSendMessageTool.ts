@@ -8,9 +8,11 @@ interface WhatsappSendMessageInput {
   quotedMsgId?: string | null;
 }
 
+// Tool: WhatsappSendMessageTool
+// Description: Esta ferramenta envia mensagens de texto para usuários ou grupos no WhatsApp, com suporte a resposta a mensagens específicas (quotedMsgId). Permite que agentes LLM interajam diretamente com usuários via texto no WhatsApp.
 class WhatsappSendMessageTool extends MCPTool<WhatsappSendMessageInput> {
   name = 'whatsapp-send-message';
-  description = 'WhatsappSendMessage tool description';
+  description = 'Envia mensagens de texto para usuários ou grupos no WhatsApp, com suporte a reply.';
 
   schema = {
     to: {

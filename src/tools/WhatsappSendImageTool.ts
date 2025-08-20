@@ -1,27 +1,35 @@
-import { MCPTool } from 'mcp-framework';
-import { z } from 'zod';
+import { MCPTool } from "mcp-framework";
+import { z } from "zod";
 import axios from 'axios';
 
-
-
-const SendImageInputSchema = z.object({
-  recipient: z.string().describe('ID do destinatário (usuário ou grupo).'),
-  base64Image: z.string().describe('A imagem em formato base64.'),
-  prompt: z.string().describe('A legenda da imagem.'),
-});
-
-interface SendImageInput {
+interface WhatsappSendImageInput {
   recipient: string;
   base64Image: string;
   prompt: string;
 }
 
-class SendImageTool extends MCPTool<SendImageInput> {
-  name = 'send_whatsapp_image';
-  description = 'Envia uma imagem via WhatsApp para um destinatário específico.';
-  schema = SendImageInputSchema;
+// Tool: WhatsappSendImageTool
+// Description: Esta ferramenta envia imagens (em base64) para um usuário ou grupo no WhatsApp, podendo associar um prompt descritivo. Ideal para agentes LLM que geram ou manipulam imagens e precisam compartilhá-las diretamente via WhatsApp.
+class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
+  name = "whatsapp-send-image";
+  description = "Envia imagens em base64 para usuários ou grupos no WhatsApp, com suporte a prompt descritivo.";
 
-  async execute(input: SendImageInput) {
+  schema = {
+    recipient: {
+      type: z.string(),
+      description: "Recipient ID (user or group).",
+    },
+    base64Image: {
+      type: z.string(),
+      description: "Base64 encoded image.",
+    },
+    prompt: {
+      type: z.string(),
+      description: "Prompt for the image.",
+    },
+  };
+
+  async execute(input: WhatsappSendImageInput) {
     const { recipient, base64Image, prompt } = input;
     try {
       const base64Prefix = "data:image/jpeg;base64,";
@@ -60,4 +68,4 @@ class SendImageTool extends MCPTool<SendImageInput> {
   }
 }
 
-export default SendImageTool;
+export default WhatsappSendImageTool;

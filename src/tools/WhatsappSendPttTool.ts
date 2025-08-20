@@ -1,26 +1,34 @@
-import { MCPTool } from 'mcp-framework';
-import { z } from 'zod';
+import { MCPTool } from "mcp-framework";
+import { z } from "zod";
 
-
-
-const SendPttInputSchema = z.object({
-  recipientId: z.string().describe('ID do destinatário (usuário ou grupo).'),
-  audioBuffer: z.instanceof(Buffer).describe('O buffer de áudio a ser enviado.'),
-  quotedMsgId: z.string().optional().describe('ID da mensagem a ser respondida (opcional).'),
-});
-
-interface SendPttInput {
+interface WhatsappSendPttInput {
   recipientId: string;
   audioBuffer: Buffer;
   quotedMsgId?: string;
 }
 
-class SendPttTool extends MCPTool<SendPttInput> {
-  name = 'send_whatsapp_ptt';
-  description = 'Envia uma mensagem de áudio (PTT) via WhatsApp para um destinatário específico.';
-  schema = SendPttInputSchema;
+// Tool: WhatsappSendPttTool
+// Description: Esta ferramenta envia áudios PTT (push-to-talk, tipo áudio do WhatsApp) para usuários ou grupos, a partir de um buffer de áudio. Útil para agentes LLM que geram ou manipulam áudios e precisam enviá-los como mensagem de voz.
+class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
+  name = "whatsapp-send-ptt";
+  description = "Envia áudios PTT (push-to-talk) para usuários ou grupos no WhatsApp.";
 
-  async execute(input: SendPttInput) {
+  schema = {
+    recipientId: {
+      type: z.string(),
+      description: "Recipient ID (user or group).",
+    },
+    audioBuffer: {
+      type: z.instanceof(Buffer),
+      description: "Audio buffer to send.",
+    },
+    quotedMsgId: {
+      type: z.string().optional(),
+      description: "ID of the message to reply to.",
+    },
+  };
+
+  async execute(input: WhatsappSendPttInput) {
     const { recipientId, audioBuffer, quotedMsgId } = input;
     try {
       console.log('sendPtt: Iniciando envio de PTT para:', recipientId);
@@ -40,7 +48,6 @@ class SendPttTool extends MCPTool<SendPttInput> {
       };
 
       const SEND_PTT_ENDPOINT = `${process.env.WHATSAPP_URL}/sendFile`;
-      console.log('sendPtt: Payload preparado, enviando para:', SEND_PTT_ENDPOINT);
 
       const fetchResponse = await fetch(SEND_PTT_ENDPOINT, {
         method: 'POST',
@@ -54,22 +61,18 @@ class SendPttTool extends MCPTool<SendPttInput> {
 
       if (!fetchResponse.ok) {
         const errorData = await fetchResponse.text();
-        throw new Error(`Erro HTTP ao enviar áudio: ${fetchResponse.status} - ${errorData}`);
+        return { success: false, data: errorData };
       }
-
       const responseData = await fetchResponse.json();
       if (responseData.success === false) {
-        throw new Error(`A API OpenWA retornou um erro: ${responseData.error?.message || JSON.stringify(responseData.error)}`);
+        return { success: false, data: responseData.error?.message || JSON.stringify(responseData.error) };
       }
 
-      console.log('Mensagem de voz enviada com sucesso!');
       return { success: true, message: 'Áudio enviado com sucesso.' };
     } catch (error: any) {
-
-      console.error('Ocorreu um erro no processo de envio de áudio:', error.message);
       return { success: false, error: error.message };
     }
   }
 }
 
-export default SendPttTool;
+export default WhatsappSendPttTool;
