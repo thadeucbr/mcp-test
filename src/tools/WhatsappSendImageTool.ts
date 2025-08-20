@@ -17,15 +17,15 @@ class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
   schema = {
     recipient: {
       type: z.string(),
-      description: "Recipient ID (user or group).",
+      description: "ID do usuário ou grupo destinatário da imagem no WhatsApp.",
     },
     base64Image: {
       type: z.string(),
-      description: "Base64 encoded image.",
+      description: "Imagem codificada em base64, incluindo prefixo data:image caso necessário.",
     },
     prompt: {
       type: z.string(),
-      description: "Prompt for the image.",
+      description: "Prompt descritivo associado à imagem, para contexto ou explicação ao destinatário.",
     },
   };
 

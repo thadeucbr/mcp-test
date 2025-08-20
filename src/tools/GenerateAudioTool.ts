@@ -4,7 +4,7 @@ import { z } from "zod";
 import OpenAI from "openai";
 
 const GenerateAudioInputSchema = z.object({
-  textToSpeak: z.string().describe("The text to be converted to audio."),
+  textToSpeak: z.string().describe("Texto que será convertido em áudio. Forneça a mensagem exata que deseja sintetizar em voz."),
 });
 
 interface GenerateAudioInput {

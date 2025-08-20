@@ -20,23 +20,23 @@ class WhatsappSendFileTool extends MCPTool<WhatsappSendFileInput> {
   schema = {
     userId: {
       type: z.string(),
-      description: 'User ID to send the file to.',
+      description: 'ID do usuário ou grupo destinatário do arquivo no WhatsApp.',
     },
     filePath: {
       type: z.string(),
-      description: 'Path to the file to send.',
+      description: 'Caminho absoluto ou relativo do arquivo a ser enviado.',
     },
     fileName: {
       type: z.string().optional(),
-      description: 'Name of the file to send.',
+      description: 'Nome do arquivo como será exibido para o destinatário (opcional).',
     },
     caption: {
       type: z.string().optional(),
-      description: 'Caption for the file.',
+      description: 'Legenda ou mensagem que acompanha o arquivo (opcional).',
     },
     withoutPreview: {
       type: z.boolean().optional().default(false),
-      description: 'Whether to send the file without a preview.',
+      description: 'Se verdadeiro, envia o arquivo sem preview/miniatura (útil para privacidade ou arquivos não visuais).',
     },
     mimeType: {
       type: z.string().optional(),

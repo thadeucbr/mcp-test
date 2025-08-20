@@ -18,19 +18,19 @@ class WhatsappSendReplyTool extends MCPTool<WhatsappSendReplyInput> {
   schema = {
     to: {
       type: z.string(),
-      description: "Recipient ID (user or group).",
+      description: "ID do usuário ou grupo destinatário da resposta no WhatsApp.",
     },
     content: {
       type: z.string(),
-      description: "Content of the message.",
+      description: "Texto da resposta a ser enviada.",
     },
     quotedMsgId: {
       type: z.string(),
-      description: "ID of the message to reply to.",
+      description: "ID da mensagem original que está sendo respondida (reply).",
     },
     sendSeen: {
       type: z.boolean().optional(),
-      description: "Whether to send a 'seen' receipt.",
+      description: "Se verdadeiro, marca a mensagem original como lida ('seen').",
     },
   };
 

@@ -3,12 +3,14 @@ import { z } from 'zod';
 import OpenAI from 'openai';
 
 const DeepResearchInputSchema = z.object({
-  query: z.string().describe('The research query.'),
-  model: z.enum(['o3-deep-research', 'o4-mini-deep-research']).default('o4-mini-deep-research').describe('The deep research model to use.'),
-  background: z.boolean().default(true).describe('Whether to run the research in the background.'),
-  vector_store_ids: z.array(z.string()).optional().describe('An array of vector store IDs to use for file search.'),
-  use_web_search: z.boolean().default(true).describe('Whether to use web search.'),
-  use_code_interpreter: z.boolean().default(false).describe('Whether to use the code interpreter.'),
+  query: z.string().describe('Consulta de pesquisa detalhada. Descreva claramente o que deseja saber, pois será usada para buscas profundas em múltiplas fontes.'),
+  model: z.enum(['o3-deep-research', 'o4-mini-deep-research'])
+    .default('o4-mini-deep-research')
+    .describe('Modelo de pesquisa profunda a ser utilizado. "o3-deep-research" para máxima profundidade, "o4-mini-deep-research" para respostas rápidas e eficientes.'),
+  background: z.boolean().default(true).describe('Se verdadeiro, executa a pesquisa em background, permitindo que o agente continue outras tarefas enquanto aguarda o resultado.'),
+  vector_store_ids: z.array(z.string()).optional().describe('Lista de IDs de vetores para busca em arquivos/documentos privados, além da web.'),
+  use_web_search: z.boolean().default(true).describe('Se verdadeiro, ativa busca na web para enriquecer a resposta com informações públicas atualizadas.'),
+  use_code_interpreter: z.boolean().default(false).describe('Se verdadeiro, permite uso de code interpreter para análises, cálculos ou manipulação de dados durante a pesquisa.'),
 });
 
 type DeepResearchInput = z.infer<typeof DeepResearchInputSchema>;

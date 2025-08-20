@@ -16,15 +16,15 @@ class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   schema = {
     recipientId: {
       type: z.string(),
-      description: "Recipient ID (user or group).",
+      description: "ID do usuário ou grupo destinatário do áudio PTT no WhatsApp.",
     },
     audioBuffer: {
       type: z.instanceof(Buffer),
-      description: "Audio buffer to send.",
+      description: "Buffer de áudio (formato ogg/opus) a ser enviado como mensagem de voz.",
     },
     quotedMsgId: {
       type: z.string().optional(),
-      description: "ID of the message to reply to.",
+      description: "ID da mensagem original a ser respondida (reply), se aplicável.",
     },
   };
 

@@ -17,15 +17,15 @@ class WhatsappSendMessageTool extends MCPTool<WhatsappSendMessageInput> {
   schema = {
     to: {
       type: z.string(),
-      description: 'ID do destinatário (usuário ou grupo).',
+      description: 'ID do destinatário (usuário ou grupo) no WhatsApp.',
     },
     content: {
       type: z.string(),
-      description: 'O conteúdo da mensagem a ser enviada.',
+      description: 'Texto da mensagem a ser enviada ao destinatário.',
     },
     quotedMsgId: {
       type: z.string().nullable().optional(),
-      description: 'ID da mensagem a ser respondida (opcional).',
+      description: 'ID da mensagem original a ser respondida (reply), se aplicável.',
     },
   };
 

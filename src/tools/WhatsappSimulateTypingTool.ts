@@ -16,11 +16,11 @@ class WhatsappSimulateTypingTool extends MCPTool<WhatsappSimulateTypingInput> {
   schema = {
     to: {
       type: z.string(),
-      description: 'Recipient ID (user or group).',
+      description: 'ID do usuário ou grupo para o qual será simulado o status de digitando.',
     },
     on: {
       type: z.boolean(),
-      description: 'Whether to simulate typing or not.',
+      description: 'Se verdadeiro, ativa a simulação de digitando; se falso, desativa.',
     },
   };
 

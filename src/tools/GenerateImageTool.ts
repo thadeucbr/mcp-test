@@ -22,23 +22,23 @@ class GenerateImageTool extends MCPTool<GenerateImageInput> {
   schema = {
     prompt: {
       type: z.string(),
-      description: 'Prompt for image generation',
+      description: 'Prompt textual detalhado para a geração da imagem. Descreva o que deve aparecer na imagem, estilo, contexto, etc.',
     },
     negative_prompt: {
       type: z.string().optional(),
-      description: 'Negative prompt for image generation',
+      description: 'Prompt negativo: elementos, estilos ou características que NÃO devem aparecer na imagem gerada.',
     },
     seed: {
       type: z.number().min(0).optional(),
-      description: 'Seed for random number generation',
+      description: 'Seed para controle de aleatoriedade. Use para obter resultados reproduzíveis.',
     },
     subseed: {
       type: z.number().min(0).optional(),
-      description: 'Subseed for additional randomness',
+      description: 'Subseed para adicionar variação extra à geração da imagem.',
     },
     subseed_strength: {
       type: z.number().min(0).optional(),
-      description: 'Strength of the subseed',
+      description: 'Intensidade do subseed. Controla o quanto o subseed influencia o resultado.',
     },
     steps: {
       type: z.number().min(1).optional(),
