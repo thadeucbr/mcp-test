@@ -11,12 +11,12 @@ interface WhatsappSendPttInput {
 // Description: Esta ferramenta envia áudios PTT (push-to-talk, tipo áudio do WhatsApp) para usuários ou grupos, a partir de um buffer de áudio. Útil para agentes LLM que geram ou manipulam áudios e precisam enviá-los como mensagem de voz.
 class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   name = "whatsapp-send-ptt";
-  description = "Envia áudios PTT (push-to-talk) para usuários ou grupos no WhatsApp.";
+  description = "Envia áudios para usuários ou grupos no WhatsApp.";
 
   schema = {
     recipientId: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário do áudio PTT no WhatsApp.",
+      description: "ID do usuário ou grupo destinatário do áudio no WhatsApp.",
     },
     audioBuffer: {
       type: z.instanceof(Buffer),
