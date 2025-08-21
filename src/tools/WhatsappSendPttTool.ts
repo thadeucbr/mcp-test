@@ -1,26 +1,29 @@
 import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 
+
+import GenerateAudioTool from "./GenerateAudioTool";
+
 interface WhatsappSendPttInput {
-  recipientId: string;
-  audioBuffer: Buffer;
+  to: string;
+  textToSpeak: string;
   quotedMsgId?: string;
 }
 
 // Tool: WhatsappSendPttTool
-// Description: Esta ferramenta envia áudios PTT (push-to-talk, tipo áudio do WhatsApp) para usuários ou grupos, a partir de um buffer de áudio. Útil para agentes LLM que geram ou manipulam áudios e precisam enviá-los como mensagem de voz.
+// Description: Esta ferramenta gera um áudio PTT (push-to-talk, tipo áudio do WhatsApp) a partir de um texto fornecido, utilizando TTS, e já envia esse áudio automaticamente para o usuário ou grupo no WhatsApp. Ideal para agentes LLM que precisam sintetizar uma mensagem de voz e entregá-la diretamente ao destinatário.
 class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   name = "whatsapp-send-ptt";
-  description = "Envia áudios para usuários ou grupos no WhatsApp.";
+  description = "Gera um áudio a partir de texto e envia como mensagem de voz (PTT) para usuários ou grupos no WhatsApp. O áudio é criado automaticamente e entregue ao destinatário.";
 
   schema = {
-    recipientId: {
+    to: {
       type: z.string(),
       description: "ID do usuário ou grupo destinatário do áudio no WhatsApp.",
     },
-    audioBuffer: {
-      type: z.instanceof(Buffer),
-      description: "Buffer de áudio (formato ogg/opus) a ser enviado como mensagem de voz.",
+    textToSpeak: {
+      type: z.string(),
+      description: "Texto que será convertido em áudio e enviado como PTT.",
     },
     quotedMsgId: {
       type: z.string().optional(),
@@ -29,16 +32,24 @@ class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   };
 
   async execute(input: WhatsappSendPttInput) {
-    const { recipientId, audioBuffer, quotedMsgId } = input;
+    const { to, textToSpeak, quotedMsgId } = input;
     try {
-      console.log('sendPtt: Iniciando envio de PTT para:', recipientId);
-      console.log('sendPtt: Tamanho do buffer de áudio:', audioBuffer.length, 'bytes');
-      
-      const audioDataUri = `data:audio/ogg;base64,${audioBuffer.toString('base64')}`;
+      // Gerar o áudio a partir do texto usando GenerateAudioTool
+      const generateAudioTool = new GenerateAudioTool();
+      const audioBuffer = await generateAudioTool.execute({ textToSpeak });
 
+      if (!audioBuffer || !(audioBuffer instanceof Buffer)) {
+        throw new Error(audioBuffer?.toString() || "Failed to generate audio buffer.");
+      }
+
+      console.log('sendPtt: Iniciando envio de PTT para:', to);
+      console.log('sendPtt: Tamanho do buffer de áudio:', audioBuffer.length, 'bytes');
+
+      const audioDataUri = `data:audio/ogg;base64,${audioBuffer.toString('base64')}`;
+      
       const payload = {
         args: {
-          to: recipientId,
+          to: to,
           file: audioDataUri,
           filename: "audio.ogg",
           quotedMsgId: quotedMsgId || undefined,
