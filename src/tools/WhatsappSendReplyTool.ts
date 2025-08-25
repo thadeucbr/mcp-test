@@ -18,7 +18,7 @@ class WhatsappSendReplyTool extends MCPTool<WhatsappSendReplyInput> {
   schema = {
     to: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário da resposta no WhatsApp.",
+      description: "Número de telefone do destinatário no WhatsApp (ex: 5511999999999@c.us para Brasil). Para grupos, use o ID do grupo no formato 1234567890-123456789@g.us. O sufixo (@c.us ou @g.us) deve ser incluído pelo usuário conforme o tipo de destinatário.",
     },
     content: {
       type: z.string(),
@@ -35,7 +35,11 @@ class WhatsappSendReplyTool extends MCPTool<WhatsappSendReplyInput> {
   };
 
   async execute(input: WhatsappSendReplyInput) {
-    const { to, content, quotedMsgId, sendSeen } = input;
+    let { to, content, quotedMsgId, sendSeen } = input;
+    // Remove o sufixo @ e tudo após, se existir
+    if (typeof to === 'string') {
+      to = to.replace(/@.*$/, '');
+    }
     const url = `${process.env.WHATSAPP_URL}/reply`;
 
     const options = {

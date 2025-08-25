@@ -25,7 +25,11 @@ class WhatsappSimulateTypingTool extends MCPTool<WhatsappSimulateTypingInput> {
   };
 
   async execute(input: WhatsappSimulateTypingInput) {
-    const { to, on } = input;
+    let { to, on } = input;
+    // Remove o sufixo @ e tudo após, se existir
+    if (typeof to === 'string') {
+      to = to.replace(/@.*$/, '');
+    }
     const WHATSAPP_URL = process.env.WHATSAPP_URL;
     const WHATSAPP_SECRET = process.env.WHATSAPP_SECRET;
 

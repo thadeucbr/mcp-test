@@ -19,7 +19,7 @@ class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   schema = {
     to: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário do áudio no WhatsApp.",
+      description: "Número de telefone do destinatário no WhatsApp (ex: 5511999999999@c.us para Brasil). Para grupos, use o ID do grupo no formato 1234567890-123456789@g.us. O sufixo (@c.us ou @g.us) deve ser incluído pelo usuário conforme o tipo de destinatário.",
     },
     textToSpeak: {
       type: z.string(),
@@ -32,7 +32,11 @@ class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   };
 
   async execute(input: WhatsappSendPttInput) {
-    const { to, textToSpeak, quotedMsgId } = input;
+    let { to, textToSpeak, quotedMsgId } = input;
+    // Remove o sufixo @ e tudo após, se existir
+    if (typeof to === 'string') {
+      to = to.replace(/@.*$/, '');
+    }
     try {
       // Gerar o áudio a partir do texto usando GenerateAudioTool
       const generateAudioTool = new GenerateAudioTool();
