@@ -92,8 +92,8 @@ class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
       type: z.number().optional(),
       description: `Number of generation steps. Higher values = better quality but slower generation.
       
-      - Range: 10-100 (recommended)
-      - Default: 30
+      - Range: 15-30 (recommended)
+      - Default: 20
       - Quality vs Speed tradeoff`
     },
     width: {
