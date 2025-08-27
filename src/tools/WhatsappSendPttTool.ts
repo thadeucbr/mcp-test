@@ -1,8 +1,6 @@
 import { MCPTool } from "mcp-framework";
 import { z } from "zod";
-
-
-import GenerateAudioTool from "./GenerateAudioTool";
+import OpenAI from "openai";
 
 interface WhatsappSendPttInput {
   to: string;
@@ -10,8 +8,6 @@ interface WhatsappSendPttInput {
   quotedMsgId?: string;
 }
 
-// Tool: WhatsappSendPttTool
-// Description: Esta ferramenta gera um áudio PTT (push-to-talk, tipo áudio do WhatsApp) a partir de um texto fornecido, utilizando TTS, e já envia esse áudio automaticamente para o usuário ou grupo no WhatsApp. Ideal para agentes LLM que precisam sintetizar uma mensagem de voz e entregá-la diretamente ao destinatário.
 class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
   name = "whatsapp-send-ptt";
   description = "Gera um áudio a partir de texto e envia como mensagem de voz (PTT) para usuários ou grupos no WhatsApp. O áudio é criado automaticamente e entregue ao destinatário.";
@@ -31,12 +27,40 @@ class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
     },
   };
 
+  private async generateAudioWithOpenAI(textToSpeak: string): Promise<Buffer> {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY environment variable is not set.");
+    }
+
+    const openai = new OpenAI({ apiKey });
+
+    const voice = process.env.OPENAI_TTS_VOICE || "onyx";
+    const model = process.env.OPENAI_TTS_MODEL || "tts-1";
+
+    try {
+      const response = await openai.audio.speech.create({
+        model: model,
+        input: textToSpeak,
+        voice: voice as any,
+        response_format: "opus",
+      });
+
+      const audioBuffer = Buffer.from(await response.arrayBuffer());
+      return audioBuffer;
+
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`OpenAI API failed: ${error.message}`);
+      }
+      throw new Error("An unknown error occurred while contacting the OpenAI API.");
+    }
+  }
+
   async execute(input: WhatsappSendPttInput) {
     const { to, textToSpeak, quotedMsgId } = input;
     try {
-      // Gerar o áudio a partir do texto usando GenerateAudioTool
-      const generateAudioTool = new GenerateAudioTool();
-      const audioBuffer = await generateAudioTool.execute({ textToSpeak });
+      const audioBuffer = await this.generateAudioWithOpenAI(textToSpeak);
 
       if (!audioBuffer || !(audioBuffer instanceof Buffer)) {
         throw new Error(audioBuffer?.toString() || "Failed to generate audio buffer.");
