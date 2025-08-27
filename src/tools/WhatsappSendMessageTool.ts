@@ -9,23 +9,50 @@ interface WhatsappSendMessageInput {
 }
 
 // Tool: WhatsappSendMessageTool
-// Description: Esta ferramenta envia mensagens de texto para usuários ou grupos no WhatsApp, com suporte a resposta a mensagens específicas (quotedMsgId). Permite que agentes LLM interajam diretamente com usuários via texto no WhatsApp.
+// Description: Esta ferramenta permite enviar mensagens de texto via WhatsApp para usuários individuais ou grupos, com suporte a replies.
 class WhatsappSendMessageTool extends MCPTool<WhatsappSendMessageInput> {
-  name = 'whatsapp-send-message';
-  description = 'Envia mensagens de texto para usuários ou grupos no WhatsApp, com suporte a reply.';
+  name = 'whatsapp_send_message';
+  description = `Send text messages through WhatsApp to individual users or groups with optional reply functionality.
+  
+  Use this tool when you need to:
+  - Send notifications, alerts, or updates to WhatsApp users
+  - Respond to user messages in a conversation
+  - Send automated messages as part of a workflow
+  - Communicate with WhatsApp groups
+  - Reply to specific messages in a conversation thread
+  
+  The tool automatically handles both regular messages and replies, falling back to regular sending if reply fails.
+  Supports both individual contacts (@s.whatsapp.net) and groups (@g.us).`;
 
   schema = {
     to: {
       type: z.string(),
-      description: 'ID do destinatário (usuário ou grupo) no WhatsApp.',
+      description: `WhatsApp recipient identifier. Can be:
+      
+      - Individual user: "5511971704940@c.us"
+      - Group: "120363123456789012@g.us"
+      
+      The tool automatically detects if it's a group or individual recipient.`,
     },
     content: {
       type: z.string(),
-      description: 'Texto da mensagem a ser enviada ao destinatário.',
+      description: `The text message content to send. Supports:
+      
+      - Plain text messages
+      - Emojis and special characters
+      - Multi-line messages
+      - URLs and links
+      
+      Maximum recommended length: 4096 characters (WhatsApp limit).`,
     },
     quotedMsgId: {
       type: z.string().nullable().optional(),
-      description: 'ID da mensagem original a ser respondida (reply), se aplicável.',
+      description: `Message ID to reply to. When provided, the message will be sent as a reply to the specified message.
+      
+      - Use this to maintain conversation context
+      - Leave empty/null for new messages
+      - Only works in group chats when specified
+      - Falls back to regular message if reply fails`,
     },
   };
 

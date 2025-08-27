@@ -16,29 +16,111 @@ interface WhatsappSendImageInput {
 }
 
 class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
-  name = "whatsapp-send-image";
-  description = "Gera automaticamente uma imagem a partir de um prompt textual usando IA generativa e envia para usuários ou grupos no WhatsApp. Permite customizar parâmetros como prompt negativo, seed, tamanho, passos, etc. Ideal para agentes LLM que precisam criar e entregar imagens sob demanda, sem etapas manuais. O envio é feito diretamente ao destinatário, com suporte a legendas e personalização avançada.";
+  name = "whatsapp_send_image";
+  description = `Generate AI images from text prompts and send them via WhatsApp to users or groups.
+  
+  This tool combines AI image generation with WhatsApp messaging to create and deliver custom images on demand.
+  Supports multiple image generation providers (OpenAI and local Stable Diffusion) with advanced customization options.
+  
+  Use this tool when you need to:
+  - Create custom images based on text descriptions
+  - Send visual content through WhatsApp
+  - Generate illustrations, artwork, or visual aids
+  - Provide visual responses to user requests
+  - Create memes, diagrams, or custom graphics
+  
+  The tool automatically handles image generation, formatting, and WhatsApp delivery with caption support.`;
 
   schema = {
     to: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário da imagem no WhatsApp.",
+      description: `WhatsApp recipient identifier where the image will be sent.
+      
+      - Individual user: "5511971704940@c.us"
+      - Group: "120363123456789012@g.us"
+      
+      The generated image will be sent directly to this recipient with the prompt as caption.`,
     },
     prompt: {
       type: z.string(),
-      description: "Prompt descritivo associado à imagem, para contexto ou explicação ao destinatário.",
+      description: `Text description of the image to generate. Be specific and descriptive for best results.
+      
+      Examples:
+      - "A beautiful sunset over mountains with vibrant colors"
+      - "A cute cartoon cat wearing a hat, digital art style"
+      - "Professional headshot of a business person in suit"
+      - "Abstract geometric pattern with blue and gold colors"
+      
+      The prompt will also be used as the image caption in WhatsApp.`,
     },
     negative_prompt: {
       type: z.string().optional(),
-      description: "Prompt negativo: elementos que NÃO devem aparecer na imagem.",
+      description: `Elements to exclude from the generated image.
+      
+      Examples:
+      - "blurry, low quality, deformed, ugly"
+      - "text, watermark, signature, logo"
+      - "people, faces, human figures"
+      
+      Leave empty to use default negative prompt.`,
     },
-    seed: { type: z.number().optional(), description: "Seed para controle de aleatoriedade." },
-    subseed: { type: z.number().optional(), description: "Subseed para variação extra." },
-    subseed_strength: { type: z.number().optional(), description: "Intensidade do subseed." },
-    steps: { type: z.number().optional(), description: "Passos de geração." },
-    width: { type: z.number().optional(), description: "Largura da imagem." },
-    height: { type: z.number().optional(), description: "Altura da imagem." },
-    pag_scale: { type: z.number().optional(), description: "Escala de guidance." },
+    seed: {
+      type: z.number().optional(),
+      description: `Random seed for reproducible image generation. Use the same seed to generate similar images.
+      
+      - Range: -1 (random) or positive integers
+      - Default: -1 (random)
+      - Same seed + same prompt = similar results`
+    },
+    subseed: {
+      type: z.number().optional(),
+      description: `Secondary seed for additional variation control. Works with subseed_strength.
+      
+      - Range: -1 (disabled) or positive integers
+      - Used for subtle variations while maintaining main composition`
+    },
+    subseed_strength: {
+      type: z.number().optional(),
+      description: `Influence strength of the subseed on the final image.
+      
+      - Range: 0.0 to 1.0
+      - 0.0 = subseed has no effect
+      - 1.0 = subseed has maximum influence
+      - Default: 0 (disabled)`
+    },
+    steps: {
+      type: z.number().optional(),
+      description: `Number of generation steps. Higher values = better quality but slower generation.
+      
+      - Range: 10-100 (recommended)
+      - Default: 30
+      - Quality vs Speed tradeoff`
+    },
+    width: {
+      type: z.number().optional(),
+      description: `Image width in pixels.
+      
+      - Range: 256-1024 (depending on provider limits)
+      - Default: 512
+      - Must be divisible by 64 for optimal results`
+    },
+    height: {
+      type: z.number().optional(),
+      description: `Image height in pixels.
+      
+      - Range: 256-1024 (depending on provider limits)
+      - Default: 512
+      - Must be divisible by 64 for optimal results`
+    },
+    pag_scale: {
+      type: z.number().optional(),
+      description: `Prompt guidance scale (classifier-free guidance). Controls how closely the image follows the prompt.
+      
+      - Range: 1.0-20.0
+      - Lower values = more creative/freer interpretation
+      - Higher values = stricter adherence to prompt
+      - Default: 7.5`
+    },
   };
 
   async saveImage(base64Data: string, filename: string): Promise<string> {

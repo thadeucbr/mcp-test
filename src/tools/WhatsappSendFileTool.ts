@@ -12,35 +12,86 @@ interface WhatsappSendFileInput {
 }
 
 // Tool: WhatsappSendFileTool
-// Description: Esta ferramenta envia arquivos (de qualquer tipo) para um usuário ou grupo no WhatsApp, podendo incluir legenda, nome do arquivo, tipo MIME e opção de enviar sem preview. Útil para agentes LLM que precisam compartilhar documentos, imagens, PDFs, etc., diretamente via WhatsApp.
+// Description: Esta ferramenta permite enviar arquivos de qualquer tipo via WhatsApp para usuários ou grupos.
 class WhatsappSendFileTool extends MCPTool<WhatsappSendFileInput> {
-  name = 'whatsapp-send-file';
-  description = 'Envia arquivos para usuários ou grupos no WhatsApp, com suporte a legenda, nome e preview.';
+  name = 'whatsapp_send_file';
+  description = `Send files of any type through WhatsApp to individual users or groups with optional captions and customization.
+  
+  This tool supports a wide range of file types including documents, images, audio, video, and archives.
+  Automatically detects MIME types, handles file validation, and provides flexible delivery options.
+  
+  Use this tool when you need to:
+  - Share documents (PDF, Word, Excel, PowerPoint)
+  - Send images, photos, or graphics
+  - Deliver audio files, music, or recordings
+  - Share videos or multimedia content
+  - Send compressed files or archives
+  - Deliver any digital content through WhatsApp
+  
+  The tool automatically handles file validation, size limits, and MIME type detection.`;
 
   schema = {
     userId: {
       type: z.string(),
-      description: 'ID do usuário ou grupo destinatário do arquivo no WhatsApp.',
+      description: `WhatsApp recipient identifier where the file will be sent.
+      
+      - Individual user: "5511971704940@c.us"
+      - Group: "120363123456789012@g.us"
+      
+      The file will be delivered directly to this recipient.`,
     },
     filePath: {
       type: z.string(),
-      description: 'Caminho absoluto ou relativo do arquivo a ser enviado.',
+      description: `Absolute or relative path to the file to be sent.
+      
+      - Must be accessible from the server
+      - File must exist and be readable
+      - Maximum size: 64MB (WhatsApp limit)
+      - Supports all file types with automatic MIME detection
+      
+      Examples:
+      - "/path/to/document.pdf"
+      - "./files/image.jpg"
+      - "data/reports/quarterly.xlsx"`,
     },
     fileName: {
-      type: z.string().optional(),
-      description: 'Nome do arquivo como será exibido para o destinatário (opcional).',
+      type: z.string().nullable().optional(),
+      description: `Custom filename to display to the recipient.
+      
+      - If not provided, uses the original filename from filePath
+      - Should include file extension for proper handling
+      - Helps recipients identify the file content
+      
+      Examples: "monthly_report.pdf", "vacation_photo.jpg"`,
     },
     caption: {
-      type: z.string().optional(),
-      description: 'Legenda ou mensagem que acompanha o arquivo (opcional).',
+      type: z.string().nullable().optional(),
+      description: `Text message to accompany the file.
+      
+      - Displayed alongside the file in WhatsApp
+      - Useful for context or instructions
+      - Supports emojis and formatting
+      - Leave empty for no caption
+      
+      Example: "Please review this document 📄"`,
     },
     withoutPreview: {
-      type: z.boolean().optional().default(false),
-      description: 'Se verdadeiro, envia o arquivo sem preview/miniatura (útil para privacidade ou arquivos não visuais).',
+      type: z.boolean().optional(),
+      description: `Control whether to show file preview/thumbnail.
+      
+      - true: Send without preview (better for privacy, non-visual files)
+      - false: Include preview if available (default)
+      - Useful for sensitive documents or when preview isn't needed`,
     },
     mimeType: {
-      type: z.string().optional(),
-      description: 'MIME type of the file.',
+      type: z.string().nullable().optional(),
+      description: `Explicit MIME type for the file.
+      
+      - If not provided, automatically detected from file extension
+      - Ensures proper handling by WhatsApp and recipient devices
+      - Should match the actual file content
+      
+      Examples: "application/pdf", "image/jpeg", "video/mp4"`,
     },
   };
 

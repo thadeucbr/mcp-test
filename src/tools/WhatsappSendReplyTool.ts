@@ -10,27 +10,60 @@ interface WhatsappSendReplyInput {
 }
 
 // Tool: WhatsappSendReplyTool
-// Description: Esta ferramenta envia uma resposta (reply) a uma mensagem específica no WhatsApp, podendo marcar como lida (sendSeen). Permite que agentes LLM respondam de forma contextualizada a mensagens recebidas.
+// Description: Esta ferramenta permite enviar replies contextuais a mensagens específicas no WhatsApp.
 class WhatsappSendReplyTool extends MCPTool<WhatsappSendReplyInput> {
-  name = "whatsapp-send-reply";
-  description = "Envia resposta a uma mensagem específica no WhatsApp, com opção de marcar como lida.";
+  name = "whatsapp_send_reply";
+  description = `Send contextual replies to specific WhatsApp messages with optional read status marking.
   
+  This tool creates threaded responses that maintain conversation context by replying directly
+  to specific messages. Essential for maintaining coherent conversations and providing
+  relevant responses in ongoing chats.
+  
+  Use this tool when you need to:
+  - Reply to specific messages in conversations
+  - Maintain conversation context and threading
+  - Provide targeted responses to user questions
+  - Mark messages as read for better UX
+  - Create conversational flows with proper message linking
+  
+  The tool ensures replies are properly linked to the original message for better user experience.`;
+
   schema = {
     to: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário da resposta no WhatsApp.",
+      description: `WhatsApp recipient identifier (user or group) where the reply will be sent.
+      
+      - Individual user: "5511971704940@c.us"
+      - Group: "120363123456789012@g.us"
+      
+      Must be the same recipient as the original message being replied to.`,
     },
     content: {
       type: z.string(),
-      description: "Texto da resposta a ser enviada.",
+      description: `The reply text content to send.
+      
+      - Will appear as a reply to the specified message
+      - Supports all text formatting and emojis
+      - Should be contextually relevant to the quoted message
+      - Maximum length: 4096 characters (WhatsApp limit)`,
     },
     quotedMsgId: {
       type: z.string(),
-      description: "ID da mensagem original que está sendo respondida (reply).",
+      description: `Unique identifier of the message being replied to.
+      
+      - Required for creating the reply thread
+      - Must be a valid message ID from the conversation
+      - The reply will be visually linked to this message in WhatsApp
+      - Essential for maintaining conversation context`,
     },
     sendSeen: {
       type: z.boolean().optional(),
-      description: "Se verdadeiro, marca a mensagem original como lida ('seen').",
+      description: `Whether to mark the original message as read ('seen').
+      
+      - true: Mark the quoted message as read
+      - false: Leave the message unread (default)
+      - Useful for managing conversation flow and user notifications
+      - Helps indicate that the message has been processed`,
     },
   };
 

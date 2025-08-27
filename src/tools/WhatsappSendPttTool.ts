@@ -9,21 +9,54 @@ interface WhatsappSendPttInput {
 }
 
 class WhatsappSendPttTool extends MCPTool<WhatsappSendPttInput> {
-  name = "whatsapp-send-ptt";
-  description = "Gera um áudio a partir de texto e envia como mensagem de voz (PTT) para usuários ou grupos no WhatsApp. O áudio é criado automaticamente e entregue ao destinatário.";
+  name = "whatsapp_send_ptt";
+  description = `Convert text to speech and send as voice message (PTT) via WhatsApp to users or groups.
+  
+  This tool uses OpenAI's Text-to-Speech API to generate natural-sounding voice audio from text,
+  then delivers it as a WhatsApp voice message. Supports multiple voices and reply functionality.
+  
+  Use this tool when you need to:
+  - Send voice messages through WhatsApp
+  - Convert text content to audio format
+  - Provide audio responses or announcements
+  - Send voice replies in conversations
+  - Deliver content in audio format for accessibility
+  - Create voice notifications or alerts
+  
+  The tool automatically handles text-to-speech conversion and WhatsApp delivery with proper audio formatting.`;
 
   schema = {
     to: {
       type: z.string(),
-      description: "ID do usuário ou grupo destinatário do áudio no WhatsApp.",
+      description: `WhatsApp recipient identifier where the voice message will be sent.
+      
+      - Individual user: "5511971704940@c.us"
+      - Group: "120363123456789012@g.us"
+      
+      The voice message will be delivered as a PTT (Push-to-Talk) message.`,
     },
     textToSpeak: {
       type: z.string(),
-      description: "Texto que será convertido em áudio e enviado como PTT.",
+      description: `The text content to convert to speech and send as voice message.
+      
+      - Supports multiple languages (depending on OpenAI TTS model)
+      - Maximum length depends on OpenAI TTS limits
+      - Will be converted to natural-sounding speech
+      - Supports various tones and speaking styles
+      
+      Examples:
+      - "Hello! This is an automated voice message."
+      - "Your appointment is confirmed for tomorrow at 2 PM."
+      - "Important: Please review the attached document."`,
     },
     quotedMsgId: {
       type: z.string().optional(),
-      description: "ID da mensagem original a ser respondida (reply), se aplicável.",
+      description: `Message ID to reply to with the voice message.
+      
+      - When provided, the voice message will be sent as a reply
+      - Useful for maintaining conversation context
+      - Leave empty for new voice messages
+      - Only works in group chats when specified`,
     },
   };
 
