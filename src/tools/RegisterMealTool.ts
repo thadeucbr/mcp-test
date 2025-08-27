@@ -133,7 +133,10 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
   };
 
   private async getMongoClient() {
-    const client = new MongoClient('mongodb://localhost:27017');
+    // Use environment variable or default to localhost
+    const mongoUrl = process.env.MONGODB_URL || 'mongodb://localhost:27017';
+    console.log('[DEBUG] Connecting to MongoDB:', mongoUrl);
+    const client = new MongoClient(mongoUrl);
     await client.connect();
     return client;
   }
