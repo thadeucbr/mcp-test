@@ -5,8 +5,8 @@ import { MongoClient, ObjectId } from 'mongodb';
 // Interfaces para as operações
 interface RegisterMealInput {
   operation: 'create' | 'read' | 'update' | 'delete' | 'daily_summary';
-  userId?: string;
-  mealId?: string;
+  userId: string; // Agora obrigatório
+  mealId: string; // Agora obrigatório
   mealData?: {
     mealType: string;
     description: string;
@@ -15,6 +15,7 @@ interface RegisterMealInput {
     protein?: number;
     fat?: number;
     date?: string;
+    consumptionDateTime?: string;
   };
 }
 
@@ -80,7 +81,7 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
       Each operation requires different parameters - see other fields for details.`,
     },
     userId: {
-      type: z.string().optional(),
+      type: z.string(),
       description: `User identifier for the operation.
 
       Required for: create, read, daily_summary
@@ -88,7 +89,7 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
       Example: "user123", "thadeu@example.com", or database ObjectId string`,
     },
     mealId: {
-      type: z.string().optional(),
+      type: z.string(),
       description: `Unique identifier of the meal to update or delete.
 
       Required for: update, delete
@@ -97,38 +98,57 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
     },
     mealData: {
       type: z.object({
-        mealType: z.string().describe(`Meal category/type. Common values:
+        mealType: z.string().describe(`Meal category/type. Accepts both Portuguese and English:
+
+        PORTUGUÊS:
+        • cafe/café - Café da manhã
+        • almoco/almoço - Almoço
+        • jantar - Jantar
+        • lanche - Lanche
+        • lanche_da_manha/lanche_da_manhã - Lanche da manhã
+        • lanche_da_tarde - Lanche da tarde
+        • ceia - Ceia
+
+        ENGLISH:
         • breakfast - Café da manhã
         • lunch - Almoço
         • dinner - Jantar
         • snack - Lanche
         • morning_snack - Lanche da manhã
         • afternoon_snack - Lanche da tarde
-        • supper - Ceia`),
+        • supper - Ceia
+
+        Examples: "almoco", "lunch", "café", "breakfast"`),
         description: z.string().describe(`Detailed description of what was consumed.
         Be specific to help with nutritional analysis.
         Examples: "2 ovos mexidos com espinafre", "Arroz branco 100g, feijão 50g, frango grelhado 150g"`),
-        calories: z.number().describe(`Total calories consumed in this meal.
+        calories: z.number().positive().describe(`Total calories consumed in this meal.
         Must be a positive number.
         Example: 350 (for a typical breakfast)`),
-        carbs: z.number().optional().describe(`Carbohydrates in grams.
+        carbs: z.number().min(0).optional().describe(`Carbohydrates in grams.
         Optional but recommended for complete nutritional tracking.
         Example: 45.5 (grams of carbs)`),
-        protein: z.number().optional().describe(`Protein in grams.
+        protein: z.number().min(0).optional().describe(`Protein in grams.
         Optional but recommended for complete nutritional tracking.
         Example: 25.0 (grams of protein)`),
-        fat: z.number().optional().describe(`Fat in grams.
+        fat: z.number().min(0).optional().describe(`Fat in grams.
         Optional but recommended for complete nutritional tracking.
         Example: 12.5 (grams of fat)`),
         date: z.string().optional().describe(`Date when the meal was consumed.
         Format: ISO 8601 string (YYYY-MM-DDTHH:mm:ss.sssZ)
         If not provided, defaults to current date/time.
         Example: "2025-08-27T08:30:00.000Z"`),
-      }).optional(),
+        consumptionDateTime: z.string().optional().describe(`Alternative date field (same as date).
+        Use this if your system sends date as consumptionDateTime.
+        Format: ISO 8601 string (YYYY-MM-DDTHH:mm:ss.sssZ)
+        Example: "2025-08-27T12:30:00.000Z"`),
+      }),
       description: `Nutritional data for the meal. Required for create and update operations.
 
       Include as much detail as possible for better nutritional tracking.
-      Macronutrients (carbs, protein, fat) are optional but highly recommended.`,
+      Macronutrients (carbs, protein, fat) are optional but highly recommended.
+
+      Note: You can use either 'date' or 'consumptionDateTime' for the meal timestamp.`,
     },
   };
 
@@ -154,19 +174,19 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
 
       switch (operation) {
         case 'create':
-          return await this.createMeal(collection, userId!, mealData!);
+          return await this.createMeal(collection, userId, mealData);
 
         case 'read':
-          return await this.readMeals(collection, userId!);
+          return await this.readMeals(collection, userId);
 
         case 'update':
-          return await this.updateMeal(collection, mealId!, mealData!);
+          return await this.updateMeal(collection, mealId, mealData);
 
         case 'delete':
-          return await this.deleteMeal(collection, mealId!);
+          return await this.deleteMeal(collection, mealId);
 
         case 'daily_summary':
-          return await this.getDailySummary(collection, userId!);
+          return await this.getDailySummary(collection, userId);
 
         default:
           return {
@@ -184,19 +204,29 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
    * Creates a meal document with nutritional information
    */
   private async createMeal(collection: any, userId: string, mealData: any) {
+    console.log('[DEBUG] createMeal called with:', { userId, mealData });
+
+    // Normalize mealType to handle both Portuguese and English
+    const normalizedMealType = this.normalizeMealType(mealData.mealType);
+    console.log('[DEBUG] Normalized mealType:', mealData.mealType, '->', normalizedMealType);
+
+    // Handle different date field names (consumptionDateTime or date)
+    const mealDate = mealData.date || mealData.consumptionDateTime;
+
     const meal: MealDocument = {
       userId,
-      mealType: mealData.mealType,
+      mealType: normalizedMealType,
       description: mealData.description,
       calories: mealData.calories,
       carbs: mealData.carbs || 0,
       protein: mealData.protein || 0,
       fat: mealData.fat || 0,
-      date: mealData.date ? new Date(mealData.date) : new Date(),
+      date: mealDate ? new Date(mealDate) : new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
+    console.log('[DEBUG] Inserting meal:', meal);
     const result = await collection.insertOne(meal);
 
     return {
@@ -210,6 +240,49 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
         },
       },
     };
+  }
+
+  /**
+   * Normalize meal type to handle both Portuguese and English inputs
+   */
+  private normalizeMealType(mealType: string): string {
+    if (!mealType) {
+      console.warn('[WARN] normalizeMealType called with empty mealType');
+      return 'snack'; // fallback
+    }
+
+    const typeMap: { [key: string]: string } = {
+      // Portuguese variations
+      'cafe': 'breakfast',
+      'café': 'breakfast',
+      'cafe_da_manha': 'breakfast',
+      'café_da_manhã': 'breakfast',
+      'almoco': 'lunch',
+      'almoço': 'lunch',
+      'jantar': 'dinner',
+      'lanche': 'snack',
+      'lanche_da_manha': 'morning_snack',
+      'lanche_da_manhã': 'morning_snack',
+      'lanche_da_tarde': 'afternoon_snack',
+      'ceia': 'supper',
+      'snack_manha': 'morning_snack',
+      'snack_tarde': 'afternoon_snack',
+
+      // English variations
+      'breakfast': 'breakfast',
+      'lunch': 'lunch',
+      'dinner': 'dinner',
+      'snack': 'snack',
+      'morning_snack': 'morning_snack',
+      'afternoon_snack': 'afternoon_snack',
+      'supper': 'supper',
+    };
+
+    const normalized = mealType.toLowerCase().replace(/\s+/g, '_');
+    const result = typeMap[normalized] || mealType; // fallback to original if not found
+
+    console.log(`[DEBUG] normalizeMealType: "${mealType}" -> "${normalized}" -> "${result}"`);
+    return result;
   }
 
   /**
@@ -260,7 +333,9 @@ class RegisterMealTool extends MCPTool<RegisterMealInput> {
       updatedAt: new Date(),
     };
 
-    if (mealData.mealType) updateData.mealType = mealData.mealType;
+    if (mealData.mealType) {
+      updateData.mealType = this.normalizeMealType(mealData.mealType);
+    }
     if (mealData.description) updateData.description = mealData.description;
     if (mealData.calories !== undefined) updateData.calories = mealData.calories;
     if (mealData.carbs !== undefined) updateData.carbs = mealData.carbs;
