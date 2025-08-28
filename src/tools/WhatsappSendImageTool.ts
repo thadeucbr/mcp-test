@@ -43,15 +43,23 @@ class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
     },
     prompt: {
       type: z.string(),
-      description: `Text description of the image to generate. Be specific and descriptive for best results.
+      description: `**MANDATORY PROMPT ENRICHMENT PROCESS:**
+      1.  **Analyze the user's original request.** Extract the core idea.
+      2.  **Enrich the idea.** Add vivid details to create a spectacular description. Think like an art director. Add elements about:
+          - **Subject and Action:** Details about appearance, clothing, expression, and what they are doing.
+          - **Setting and Environment:** Where does the scene take place? Time of day, weather, location details.
+          - **Art Style:** (Ex: Photorealistic, Digital Painting, 3D Render, Anime, Watercolor, Oil Painting, Cyberpunk).
+          - **Lighting:** (Ex: Cinematic lighting, Volumetric light, Neon glow, Golden hour, Dramatic rim lighting).
+          - **Composition and Angle:** (Ex: Extreme close-up, Wide shot, Low angle, Portrait, Bokeh).
+          - **Quality:** Use terms like "Insanely detailed, Intricate, 8K, Hyperrealistic".
+      3.  **Format the Final Prompt:** Combine all details into a single, cohesive paragraph, **IN ENGLISH**, with elements separated by commas.
+      4.  **Fill this 'prompt' field with the final enriched result.**
       
-      Examples:
-      - "A beautiful sunset over mountains with vibrant colors"
-      - "A cute cartoon cat wearing a hat, digital art style"
-      - "Professional headshot of a business person in suit"
-      - "Abstract geometric pattern with blue and gold colors"
-      
-      The prompt will also be used as the image caption in WhatsApp.`,
+      **Example Flow:**
+      - User's request: "draw a wizard cat"
+      - Your mental enrichment process: Subject (gray cat with a wizard hat and staff), Setting (ancient library), Lighting (candlelight), Style (detailed digital painting).
+      - **Final value for this field:** "A wise gray cat wearing a pointed wizard hat and holding a glowing staff, sitting on a pile of ancient books in a mystical library, illuminated by candlelight, digital painting, intricate details, fantasy art."
+      `,
     },
     negative_prompt: {
       type: z.string().optional(),
@@ -222,6 +230,7 @@ class WhatsappSendImageTool extends MCPTool<WhatsappSendImageInput> {
   }
 
   async execute(input: WhatsappSendImageInput) {
+    console.log('[DEBUG] WhatsappSendImageTool.execute chamado com input:', input);
     const { to, prompt, negative_prompt, seed, subseed, subseed_strength, steps, width, height, pag_scale } = input;
     try {
       const imageResult = await this.generateImage({
